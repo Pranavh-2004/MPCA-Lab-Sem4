@@ -1,0 +1,248 @@
+Semicolon (;) is used to add comments
+
+Junk value -> 81818181
+1 nibble -> 4 bits
+1 full word = 32 bits = 8 nibbles
+1008 + 4 = 1012 -> 100c (Hexa)
+4096 + 12 = 4108
+
+SUB R3, R0, R1 => R3 = R0 - R1
+-> does not set Z flag bit to 1 even if result is 0
+
+SUBS R3, R0, R1
+-> sets Z to 1 if result is 0
+
+ADDING S FLAG TO A INSTRUCTION WILL ENABLE IT TO SET Z AND C FLAG TO 1 WHEN REQUIRED
+
+CMP R0, R1
+-> Performs R0-R1, result is not stored anywhere, but flag bits are set/reset depending on the result
+-> Z is set to 1 if result is 0
+-> C is also set to 1 by hardware, need to take care of that while writing program
+
+ex : R0 = 5 and R1 = 5
+R0-R1 = 0 -> N=0, Z=1, V=0, C=0
+
+MVN and CMN
+->Move negate and compare negate
+->Move negate does 1s complement and just flips the bits
+
+MVN R0,#5
+->R0 has -6 now
+
+CMN-
+CMN R3,R1 means
+->R3-R1
+->R3-(-R1)
+->R3+R1
+->If result is 0 it changes Z and C flag to 0
+
+To set a hexadecimal value in a register put 0x before the hexadecimal number.
+
+ADDS
+->Sets carry flag when there is a carry which is not observed in ADD
+
+Hexadecimal
+->0xFFFFFFFF is negative
+->0x0FFFFFFF is positive
+->If first of 8 bits is 0 its positive and if its F its negative
+
+ADC
+-> ADD with carry
+-> Takes the carry from previous addition and adds it with current addition
+-> Use ADDS before this for the carry bit to be set
+
+You can save a 64 bit number in two 32 bit registers
+
+.TEXT
+->Assembler directive => Instruction to assemble
+->Code under this is Non-executable =>Just tells the assembler about the data types and variable initialization
+
+A:
+->"A:" is a label => address for a variable
+
+.WORD
+->Initialises data
+->Assembler directive
+->Reserves memory as much as needed by data written.
+-> [1,2,3,4,5]= 32*5 = 160 bits = 20 bytes
+->If u start with 0x it takes as hexadecimal and if nothing specified it is taken as decimal
+
+.CODE
+->Assembler directive
+->Tells assembler that the following content is code to be executed
+->Code under this is Executable => Tells the assembler that the following content is actions to be done on data like array manipulation
+
+LDR
+->Load register 
+
+BEQ
+->Branch on equal to
+->Checks for Z flag being equal to 1 then branches
+
+BNE
+->Branch on not equal to
+
+STR 
+->Storing data
+
+YOU CANT SPECIFY TWO MEMORY LOCATIONS IN ONE INSTRUCTION
+ONLY LDR AND STR INSTRUCTIONS CAN USE MEMORY LOCATIONS
+MEMORY LOCATION ALWAYS ON RIGHT AND OPERAND ON LEFT IN LDR AND STR
+
+SWI 0X011
+->Software interrupt 
+->To end execution
+->Logical end for processor
+
+SWI 0X00
+->Software interrupt to print string byte by byte or character by character
+
+SWI 0X02
+->Software interrupt to print string as a whole string all at once
+
+.END
+->Physical end for assembler
+
+AND
+->Bitwise 'and' 
+
+ORR
+->Bitwise 'or'
+
+EOR
+->Bitwise 'xor'
+
+BIC
+->Bit clear (to clear a bit)
+->BIC r0,r1,r2 means r0=r1 AND (NOT r2)
+
+TST
+->Bit test
+->CC => condition code
+->Operation is done, Z flag is set to 1 if result is zero, but result is not stored anywhere
+
+LSL
+->Left shift
+->LSL #n where n is the number of left shifts
+
+LSR
+->Right shift
+->LSR #n where n is the number of right shifts
+
+B
+->Branch
+->No condition
+
+BCC
+->Branch on carry clear
+
+BCS
+->Branch on carry set
+
+SBC
+->SUB with carry minus 1
+->R1-R2+C-1
+
+RSB
+->RSB R2,R1,R0
+->It means R2=R0-R1
+
+[R1,#4]
+->Adds 4 then uses that address
+->Pre indexing
+
+LDR R3,[R1,#4]!
+->Pre-indexed with writeback or auto indexing
+->R1 is automatically updated after each iteration (previously R1 was not getting updated)
+->4 is called offset value or displacement value 
+->4 is added first then the resulting value is used. (Pre-increment)
+->To prevent first value from getting missed start R1 from (start value-4) initially
+
+LDR R3,[R1],#4
+->Post increment or Post indexing
+->Use value then increment by 4
+
+ROR
+->Rotate right
+->One bit from LSB moves to MSB and every other bit moves right by one bit position
+->01011011 becomes 10101101
+
+RRX
+->Rotate right extended
+->Carry goes to MSB and LSB goes to carry
+
+MUL
+->Multiplication
+->MUL R0,R0,R1 is wrong as both in and out signal gates will be open at same time if u do this
+->Do MUL R0,R1,R0 it is correct
+
+MLA
+->Multiply and accumulate
+->MLA R2,R1,R2,R0
+->Result is R2=(R1*R2)+R0
+
+SMULL R6,R5,R4,R3
+->Signed long
+->Range is -2^(31) to 2^(31)-1
+->R6 is low order and R5 is high order
+->R5 has first 32 bits of multiplication result of R4 and R3 and R6 has the next 32 bits
+
+UMULL R6,R5,R4,R3
+->Unsigned long
+->Range is 0 to 2^(32)-1
+->Works same as SMULL
+
+BANDWIDTH IS 32 BITS (AT A TIME U CAN HANDLE 32 BITS). IT DOES NOT CHANGE. IT IS SAME AS WIDTH OF THE BUS
+
+LDMIA
+->Load Multiple Increment After
+->Loads data from memory into multiple registers
+->LDMIA R0!,{R1-R4} means R0 has location of a memory unit and R1 through R4 get data from that memory location
+->LDMIA R1!,{R4,R5,R8,R9,R10,R7,R11,R6}. Order of registers doesn't matter it'll take the registers in ascending order only
+->LDMIA R1!,{R4,R5,R8-R11,R7,R6}. You can mix and match the above methods and order doesn't matter. It'll work the same
+->The exclamation mark tells assembler that u want to update the address of R0. Without it the base registers(R0) address wont change and u wont get access to all data
+
+STMIA
+->Store Multiple Increment After
+->Stores data onto memory from multiple registers
+->Works similar to LDMIA except it stores instead of loading
+->STMIA R2!,{R4-R11} means data from R4 through R11 will be stores in memory location which is stores in R2 register
+
+LDMIB
+->Load Multiple Increment Before
+->Increments then loads
+
+STMIB
+->Store Multiple Increment Before
+->Increments first then stores
+
+LDMDA
+->Load Multiple Decrement After
+->Highest address in highest registers then address decrements and data moves to next highest register.
+->Highest address doesn't mean end of array but the same number of address jumps as number of registers we are loading to 
+
+REGISTER PARAMETER PASSING IS BASICALLY PASSING VALUE OF REGISTERS TO FUNCTIONS
+
+LDRB
+->Moves byte content from a memory address to a register
+
+STRB
+->Stores byte content from a register to a memory location
+
+LDRH
+->Moves halfword content from a memory address to a register
+
+STRH
+->Stores halfword content from a register to a memory location
+
+MRS
+->Moves data from status register to a normal register. Status register is CPSR or SPSR
+
+MSR
+->Moves data from normal register to a status register. The _FIELD decides which bits it takes.
+
+MSR CPSR_C
+->_C is control field which is bits (0:7) of status register.
+->_X is extension field which is bits (8:15) of status register.
+->_S is status field which is bits (16:23) of status register.
+->_F is flag field which is bits (24:31) of status register.
