@@ -1,0 +1,6 @@
+install gcc on mac using homebrew: brew install gcc
+to check for gcc installed: which gcc-14
+
+compiling with gcc:
+/opt/homebrew/bin/gcc-14 <filename>.c -o <filename> -fopenmp
+./<filename>
